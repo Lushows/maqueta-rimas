@@ -76,22 +76,32 @@ nav:hover .nav-in img{filter:none;}
   .sec-top{flex-wrap:wrap;}
   .count{margin-left:0;width:100%;padding-bottom:0;}
   .rail{padding-right:18px;margin-right:-18px;}
+  /* que la foto del encabezado sí se vea en pantalla angosta */
+  .hero-img{object-position:58% 20%;}
+  .hero-veil{
+    background:
+      linear-gradient(to top,#000 2%,rgba(0,0,0,.46) 40%,rgba(0,0,0,.08) 100%),
+      radial-gradient(140% 78% at 50% 38%,transparent 42%,rgba(0,0,0,.5) 100%);
+  }
 }
 
 /* ============ hero ============ */
 .hero{position:relative;min-height:84vh;display:flex;align-items:flex-end;overflow:hidden;}
 .hero-img{
-  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:52% 28%;
-  filter:grayscale(1) contrast(1.12) brightness(.82);
-  transition:filter 1.6s cubic-bezier(.2,.7,.3,1);
+  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:52% 26%;
+  animation:revelado 2.8s cubic-bezier(.2,.7,.3,1) .45s both;
 }
-.hero:hover .hero-img{filter:grayscale(0) contrast(1.04) brightness(.92);}
+/* el encabezado entra en blanco y negro y se revela solo, como un positivado */
+@keyframes revelado{
+  from{filter:grayscale(1) contrast(1.16) brightness(.68);transform:scale(1.06);}
+  to  {filter:grayscale(0) contrast(1.03) brightness(1);transform:scale(1);}
+}
 .hero-veil{
   position:absolute;inset:0;
   background:
-    radial-gradient(120% 85% at 50% 45%,transparent 30%,rgba(0,0,0,.72) 100%),
-    linear-gradient(to top,#000 3%,rgba(0,0,0,.55) 45%,rgba(0,0,0,.25) 100%),
-    linear-gradient(to right,rgba(0,0,0,.86) 0%,rgba(0,0,0,.12) 62%);
+    radial-gradient(125% 85% at 50% 42%,transparent 34%,rgba(0,0,0,.66) 100%),
+    linear-gradient(to top,#000 2%,rgba(0,0,0,.50) 44%,rgba(0,0,0,.18) 100%),
+    linear-gradient(to right,rgba(0,0,0,.78) 0%,rgba(0,0,0,.06) 58%);
 }
 .hero-in{position:relative;width:100%;padding:0 28px 68px;max-width:1180px;margin:0 auto;}
 .hero-mark{width:min(430px,74vw);display:block;margin-bottom:26px;}
@@ -153,6 +163,23 @@ h2{font-family:var(--display);text-transform:uppercase;font-size:clamp(28px,4.6v
 /* efecto sala: al entrar al riel, lo que no se mira se apaga */
 .rail:hover .poster,.rail:hover .flyer{opacity:.38;}
 .rail:hover .poster:hover,.rail:hover .flyer:hover,.rail .poster:focus-visible{opacity:1;}
+
+/* ---- en celular no hay cursor: manda el cartel que quede en el centro ---- */
+body.touch .rail .poster,body.touch .rail .flyer{opacity:.4;}
+body.touch .poster.lit,body.touch .flyer.lit{
+  opacity:1;transform:translateY(-6px);border-color:var(--c);
+  box-shadow:0 0 0 1px var(--c),0 20px 48px -20px var(--c);
+}
+body.touch .poster.lit .poster-art img,body.touch .flyer.lit img{
+  filter:grayscale(0) contrast(1) brightness(1);
+}
+body.touch .poster.lit .poster-art img{transform:scale(1.04);}
+body.touch .poster.lit .stamp,body.touch .flyer.lit .flyer-place{color:var(--c);}
+body.touch .poster.lit .billing{border-color:var(--c);}
+body.touch .poster.lit .play{opacity:1;}
+body.touch .poster.todo.lit{transform:none;box-shadow:none;border-color:var(--rule-hi);}
+/* fotos grandes: toman color al entrar en pantalla */
+body.touch .editorial figure.lit img,body.touch .strip.lit img{filter:none;}
 
 /* cartel pendiente */
 .poster.todo{border-style:dashed;background:transparent;}
@@ -527,6 +554,23 @@ footer{margin-top:84px;border-top:1px solid var(--rule);padding:26px 0 60px;disp
 </div>
 
 <script>
+/* En pantallas táctiles no existe el cursor, así que el papel del "pasar por
+   encima" lo hace la posición: se enciende el cartel que quede en el centro. */
+(function(){
+  if (!window.matchMedia('(hover: none)').matches || !('IntersectionObserver' in window)) return;
+  document.body.classList.add('touch');
+
+  var banda = new IntersectionObserver(function(es){
+    es.forEach(function(e){ e.target.classList.toggle('lit', e.isIntersecting); });
+  }, { rootMargin: '0px -38% 0px -38%', threshold: 0.01 });
+  document.querySelectorAll('.rail .poster, .rail .flyer').forEach(function(el){ banda.observe(el); });
+
+  var enPantalla = new IntersectionObserver(function(es){
+    es.forEach(function(e){ if (e.isIntersecting) e.target.classList.add('lit'); });
+  }, { threshold: 0.35 });
+  document.querySelectorAll('.editorial figure, .strip').forEach(function(el){ enPantalla.observe(el); });
+})();
+
 document.querySelectorAll('.arrows button').forEach(function(b){
   b.addEventListener('click', function(){
     var rail = document.getElementById(b.dataset.rail);
