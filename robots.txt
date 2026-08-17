@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://lushows.github.io/elrimaslatinas/sitemap.xml
+Sitemap: https://elrimaslatinas.github.io/sitemap.xml
