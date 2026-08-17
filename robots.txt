@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://lushows.github.io/maqueta-rimas/sitemap.xml
